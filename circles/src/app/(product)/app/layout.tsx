@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Wordmark } from "@/components/SiteNav";
+import { Wordmark } from "@/components/Wordmark";
 import { useStore } from "@/lib/store";
 
 const TABS = [
@@ -30,9 +30,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="shell">
       <aside className="side">
-        <Link href="/" className="side__brand" aria-label="Circles home">
+        <a href="/" className="side__brand" aria-label="Circles home">
           <Wordmark />
-        </Link>
+        </a>
         <nav aria-label="App">
           <ul className="tabs">
             {TABS.map(([label, href]) => (

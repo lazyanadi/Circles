@@ -770,3 +770,62 @@ legend {
     display: none;
   }
 }
+
+/* ---------- Shared with the landing page: display face, night ground, gold ---------- */
+:root {
+  --night: #07110d;
+  --on-night: #eef5f1;
+  --on-night-2: rgba(226, 238, 231, 0.84);
+  --gold: #e9c46a;
+  --display: var(--font-display), "Didot", "Bodoni 72", Georgia, serif;
+}
+::selection {
+  background: var(--gold);
+  color: var(--night);
+}
+.page-head h1,
+.login__card h1,
+.figure__n,
+.circle-link__pool,
+.circle-card__pool,
+.circle-card h2,
+.request__big {
+  font-family: var(--display);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+.proto {
+  background: var(--night);
+  color: var(--on-night-2);
+}
+.figure--ink {
+  background: var(--night);
+}
+.side .wordmark,
+.login__brand .wordmark {
+  font-family: var(--display);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+
+/* Login: the dark jewel box the landing page opens in. */
+.login {
+  background:
+    radial-gradient(60% 50% at 70% 30%, rgba(43, 217, 148, 0.16), transparent 70%),
+    var(--night);
+  color: var(--on-night);
+  min-height: calc(100vh - 36px);
+}
+.login__brand {
+  color: var(--on-night);
+}
+.login__brand .wordmark__dot {
+  background: var(--gold);
+  box-shadow: inset 0 0 0 0.16em var(--night);
+}
+.login__card {
+  color: var(--ink);
+}
+.login .persona--on {
+  background: var(--gold);
+}

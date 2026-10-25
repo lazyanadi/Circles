@@ -8,15 +8,10 @@ This is a prototype. UPI, eKYC and the NBFC-P2P partner are simulated, and no re
 
 | Folder | What it is |
 | --- | --- |
-| `circles-vercel/` | The current landing page as one self-contained `index.html`, ready to deploy on Vercel (or any static host). |
-| `circles-static/` | The source of that page (`index.html`, written for publishing as a Claude artifact) and `circles-jewel.blend`, the Blender scene of the green stone and gold rings. |
-| `circles/` | The Next.js 15 app: an earlier landing page plus the working demo app (persona login, circles, voting, repayments, ledger, profile). |
+| `circles/` | The site: the landing page at `/` and the demo app at `/login` and `/app`. Next.js 15. |
+| `circles-static/` | The landing page as a standalone artifact (`index.html`, no links into the app) and `circles-jewel.blend`, the Blender scene of the green stone and gold rings. |
 
-## Landing page
-
-Open `circles-vercel/index.html` in a browser, or deploy that folder on Vercel with no build step. The 3D centrepiece (a natural green stone in a gold bezel, pavé halo and woven gold bands) is built with three.js inside the page.
-
-## Demo app
+## Run it
 
 ```bash
 cd circles
@@ -24,9 +19,17 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000/login, pick Ananya, Vikram or Imran, and use the OTP `123456`.
+Open http://localhost:3000. "Try the demo" opens the app; pick Ananya, Vikram or Imran and use the code `123456`. The calculator's "Ask a circle for this" carries the chosen amount and term into the app's loan request form.
 
-Note: `circles/src/components/OrbitScene.tsx` is mid-migration to load an exported model from `public/models/circle-diamond.glb`, which has not been exported yet, so the Next.js landing page currently shows no 3D object. The demo app itself is unaffected.
+## How the two halves fit
+
+- The landing page is a self-contained HTML page at `circles/public/landing.html` (three.js scene, calculator, opening animation). `next.config.ts` serves it at `/`.
+- The demo app lives in `circles/src/app/(product)/`: login, home, circles, loans, ledger and profile, backed by a localStorage store in `circles/src/lib/store.tsx`.
+- Both use Bodoni Moda for display type and DM Sans for text, with the same night green, gold and pearl palette.
+
+## Deploy on Vercel
+
+Import this repo at https://vercel.com/new, set **Root Directory** to `circles`, keep the detected Next.js settings, and deploy.
 
 ## Credits
 

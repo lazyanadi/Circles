@@ -1,10 +1,9 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import Arrow from "@/components/Arrow";
-import { Wordmark } from "@/components/SiteNav";
+import { Wordmark } from "@/components/Wordmark";
 import { PERSONAS } from "@/lib/seed";
 import { useStore } from "@/lib/store";
 
@@ -41,9 +40,9 @@ function Login() {
 
   return (
     <main className="login">
-      <Link href="/" className="login__brand" aria-label="Circles home">
+      <a href="/" className="login__brand" aria-label="Circles home">
         <Wordmark />
-      </Link>
+      </a>
       <form className="login__card" onSubmit={submit}>
         <h1>Sign in to the demo</h1>
         <fieldset>

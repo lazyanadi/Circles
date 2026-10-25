@@ -86,7 +86,7 @@ export default function ProfilePage() {
           <button className="btn btn--small btn--soft" onClick={reset}>
             Reset demo data
           </button>
-          <button className="btn btn--small btn--ink" onClick={() => { logout(); router.push("/"); }}>
+          <button className="btn btn--small btn--ink" onClick={() => { logout(); window.location.assign("/"); }}>
             Sign out
           </button>
         </div>

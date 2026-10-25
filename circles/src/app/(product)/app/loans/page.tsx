@@ -6,6 +6,8 @@ import { Empty, LoanCard, Money, VoteBlock } from "@/components/ui";
 import { emi } from "@/lib/finance";
 import { useStore, voters } from "@/lib/store";
 
+const TERMS = [3, 4, 5, 6, 8, 10, 12];
+
 function RequestForm() {
   const { state, me, requestLoan } = useStore();
   const params = useSearchParams();
@@ -14,7 +16,9 @@ function RequestForm() {
   const start = Math.min(cap, Number(params.get("amount")) || 3000);
   const [circleId, setCircleId] = useState(circles[0]?.id ?? "");
   const [amount, setAmount] = useState(start);
-  const [months, setMonths] = useState(Math.min(12, Math.max(3, Number(params.get("months")) || 4)));
+  // The calculator allows any month count; snap it to the nearest term the form offers.
+  const asked = Number(params.get("months")) || 4;
+  const [months, setMonths] = useState(TERMS.reduce((best, t) => (Math.abs(t - asked) < Math.abs(best - asked) ? t : best), TERMS[0]));
   const [purpose, setPurpose] = useState("");
   const [sent, setSent] = useState<string | null>(null);
 
@@ -54,7 +58,7 @@ function RequestForm() {
         <label className="field">
           <span>Months to repay</span>
           <select value={months} onChange={(e) => setMonths(Number(e.target.value))}>
-            {[3, 4, 5, 6, 8, 10, 12].map((m) => (
+            {TERMS.map((m) => (
               <option key={m} value={m}>
                 {m} months
               </option>

@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Circles</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=DM+Sans:opsz,wght@9..40,300..700&display=swap">
@@ -291,7 +290,7 @@ html:not(.intro-wait) .skip { opacity: 0; pointer-events: none; }
     <a href="#pricing">Pricing</a>
     <a href="#faq">FAQ</a>
   </nav>
-  <a href="#calc" class="btn btn--small">Work out a loan <span class="arrow" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5 8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+  <a href="/login" class="btn btn--small">Try the demo <span class="arrow" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5 8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
 </header>
 
 <main id="top">
@@ -300,8 +299,8 @@ html:not(.intro-wait) .skip { opacity: 0; pointer-events: none; }
       <h1 id="hero-title" data-fall style="--i:1">Your friends are the <span class="gild">bank.</span></h1>
       <p class="hero__sub" data-fall style="--i:2">Circles helps 5 to 20 people who trust each other pool ₹500 to ₹5,000 a month, vote on loans for one another and repay by UPI, at a rate the circle sets.</p>
       <div class="hero__actions" data-fall style="--i:3">
-        <a href="#calc" class="btn btn--accent">Work out a loan <span class="arrow" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5 8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
-        <a href="#how" class="btn btn--ghost">See how it works</a>
+        <a href="/login" class="btn btn--accent">Try the demo <span class="arrow" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5 8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+        <a href="#calc" class="btn btn--ghost">Work out a loan</a>
       </div>
     </div>
     <div class="hero__aside" data-fall style="--i:4">
@@ -386,6 +385,7 @@ html:not(.intro-wait) .skip { opacity: 0; pointer-events: none; }
           <div class="save"><dt>You keep</dt><dd class="num" id="keep"></dd></div>
           <div><dt id="share-l"></dt><dd class="num" id="share"></dd></div>
         </dl>
+        <a class="btn btn--ink" id="ask" href="/login" style="align-self:start">Ask a circle for this <span class="arrow" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5 8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
       </div>
     </div>
   </section>
@@ -463,8 +463,8 @@ html:not(.intro-wait) .skip { opacity: 0; pointer-events: none; }
 
   <section class="s s--night cta" id="close" aria-labelledby="cta-title">
     <h2 id="cta-title">Start your circle.</h2>
-    <p class="lede">Pick a few people you'd lend to without thinking twice. That's your circle.</p>
-    <a href="#calc" class="btn btn--accent">Work out a loan <span class="arrow" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5 8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+    <p class="lede">Pick a person, sign in with the code 123456, and vote on a loan in a working circle.</p>
+    <a href="/login" class="btn btn--accent">Try the demo <span class="arrow" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5 8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
   </section>
 </main>
 
@@ -472,7 +472,7 @@ html:not(.intro-wait) .skip { opacity: 0; pointer-events: none; }
   <a href="#top" class="wordmark"><i aria-hidden="true"></i>circles</a>
   <div class="footer__cols">
     <p>Circles is a prototype. UPI, eKYC and the NBFC-P2P partner are simulated and no real money moves. Lending carries risk, including the loss of what you lend.</p>
-    <ul><li><a href="#how">How it works</a></li><li><a href="#safety">Safety</a></li><li><a href="#pricing">Pricing</a></li><li><a href="#faq">FAQ</a></li></ul>
+    <ul><li><a href="#how">How it works</a></li><li><a href="#safety">Safety</a></li><li><a href="#pricing">Pricing</a></li><li><a href="#faq">FAQ</a></li><li><a href="/login">Demo app</a></li></ul>
     <p class="small">© 2026 Circles</p>
   </div>
 </footer>
@@ -506,6 +506,7 @@ html:not(.intro-wait) .skip { opacity: 0; pointer-events: none; }
     $("int").textContent = rupees(mine);
     $("app").textContent = rupees(app);
     $("keep").textContent = rupees(app - mine);
+    $("ask").href = `/login?amount=${a}&months=${m}`;
     $("share-l").textContent = `Each of the other ${n - 1} lends about`;
     $("share").textContent = `${rupees(a / (n - 1))}, and earns ${rupees(mine / (n - 1))} back`;
     window.dispatchEvent(new CustomEvent("circles:members", { detail: n }));
