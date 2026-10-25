@@ -1,0 +1,966 @@
+<title>Circles</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=DM+Sans:opsz,wght@9..40,300..700&display=swap">
+<style>
+/* Layout: one fixed jewel behind the page. The world is a dark jewel box at the top and the close,
+   a pale pearl-green ground in between; sections alternate solid paper and frosted glass over it. */
+:root {
+  color-scheme: light;
+  --ground: #e2e8e4;
+  --night: #07110d;
+  --on-night: #eef5f1;
+  --on-night-2: rgba(226, 238, 231, 0.84);
+  --gold: #e9c46a;
+  --display: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+  --paper: #ffffff;
+  --panel: #f1f2f2;
+  --ink: #0b0c0c;
+  --ink-2: #4a5053;
+  --accent: #ffb000;
+  --rust: #6f3520;
+  --on-dark: #ffffff;
+  --glass: rgba(255, 255, 255, 0.46);
+  --glass-strong: rgba(255, 255, 255, 0.74);
+  --glass-dark: rgba(10, 18, 14, 0.74);
+  --track: rgba(11, 12, 12, 0.12);
+  --blur: 22px;
+  --r: 8px;
+  --gutter-l: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+  --m: clamp(16px, 2.8vw, 40px);
+  --section: clamp(96px, 12vw, 180px);
+  --font: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --t-display: clamp(50px, 7.2vw, 96px);
+  --t-h2: clamp(34px, 4.6vw, 68px);
+  --t-lede: clamp(20px, 2.1vw, 28px);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+body { background: var(--ground); color: var(--ink); font-family: var(--font); font-size: 18px; line-height: 1.5; -webkit-font-smoothing: antialiased; caret-color: var(--ink); scrollbar-color: #8a7a4e var(--night); }
+::selection { background: var(--gold); color: var(--night); }
+/* Film grain over the whole world, between the jewel and the page, so no surface reads flat. */
+.grain { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.11; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+h1, h2, .big, .fig, .mode__fig, .pfig, .mono, footer .wordmark { font-family: var(--display); }
+h1, h2 { font-weight: 500; font-optical-sizing: auto; }
+.gild { font-style: italic; color: var(--gold); }
+
+/* Night sections: the hero and the close sit in the dark jewel box. Without the 3D they carry their own dark ground. */
+.s--night { color: var(--on-night); background: var(--night); }
+html.has-jewel body { background: var(--night); }
+html.has-jewel .s--night { background: transparent; }
+.s--night .small, .s--night .lede { color: var(--on-night-2); }
+.s--night .vote .small { color: var(--ink-2); }
+.s--night :focus-visible { outline-color: var(--gold); }
+.s--night .btn--ghost { --bg: rgba(238, 245, 241, 0.1); --fg: var(--on-night); }
+.s--night .btn--ghost:hover { --bg: rgba(238, 245, 241, 0.18); }
+*, *::before, *::after { box-sizing: border-box; }
+h1, h2, h3, p, ol, ul, dl, dd, figure { margin: 0; }
+h1, h2, h3 { font-weight: 500; text-wrap: balance; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 4px; }
+.num { font-variant-numeric: tabular-nums; }
+
+#jewel { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; display: block; }
+main, footer, .nav { position: relative; z-index: 1; }
+
+.s { padding-block: var(--section); padding-left: max(var(--m), env(safe-area-inset-left, 0px)); padding-right: max(var(--m), env(safe-area-inset-right, 0px)); }
+.s--paper { background: var(--paper); }
+.s--panel { background: var(--panel); }
+.glass { background: var(--glass); -webkit-backdrop-filter: blur(var(--blur)) saturate(1.15); backdrop-filter: blur(var(--blur)) saturate(1.15); }
+.s h2 { font-size: var(--t-h2); line-height: 1.02; letter-spacing: -0.025em; max-width: 16ch; }
+.s h3 { font-size: clamp(22px, 1.9vw, 30px); line-height: 1.15; letter-spacing: -0.02em; }
+.lede { font-size: var(--t-lede); line-height: 1.3; letter-spacing: -0.015em; max-width: 34ch; }
+.small { font-size: 15px; color: var(--ink-2); }
+
+.btn { --bg: var(--paper); --fg: var(--ink); display: inline-flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 22px 0 24px; border: 0; border-radius: var(--r); background: var(--bg); color: var(--fg); font: 500 16px/1 var(--font); text-decoration: none; cursor: pointer; transition: transform 160ms var(--ease), background-color 200ms ease; }
+.btn:active { transform: scale(0.97); }
+.btn .arrow { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--fg); color: var(--bg); transition: transform 200ms var(--ease); }
+.btn:hover .arrow { transform: translateX(3px); }
+.btn--ink { --bg: var(--ink); --fg: var(--paper); }
+.btn--accent { --bg: var(--accent); --fg: var(--ink); }
+.btn--ghost { --bg: var(--glass-strong); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
+.btn--small { min-height: 40px; padding: 0 14px 0 16px; font-size: 15px; }
+
+/* Navigation */
+.nav { position: fixed; top: calc(16px + env(safe-area-inset-top, 0px)); left: max(var(--m), env(safe-area-inset-left, 0px)); right: max(var(--m), env(safe-area-inset-right, 0px)); z-index: 10; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; }
+.wordmark { display: inline-flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 600; letter-spacing: -0.04em; text-decoration: none; transition: color 400ms ease; }
+[data-tone="night"] .nav .wordmark { color: var(--on-night); }
+[data-tone="night"] .nav .wordmark i { box-shadow: inset 0 0 0 0.16em var(--night); background: var(--gold); }
+.wordmark i { width: 0.62em; height: 0.62em; border-radius: 50%; background: var(--accent); box-shadow: inset 0 0 0 0.16em var(--ink); }
+.pill { display: flex; gap: 4px; height: 56px; align-items: center; padding: 0 10px; border-radius: 999px; background: var(--glass-dark); -webkit-backdrop-filter: blur(var(--blur)) saturate(1.2); backdrop-filter: blur(var(--blur)) saturate(1.2); }
+.pill a { color: var(--on-dark); padding: 10px 16px; border-radius: 999px; font-size: 16px; text-decoration: none; transition: background-color 200ms ease; }
+.pill a:hover { background: rgba(255, 255, 255, 0.16); }
+.nav .btn { justify-self: end; }
+
+/* Hero */
+.hero { min-height: 92vh; display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); align-items: end; gap: 40px; padding-top: 150px; padding-bottom: 56px; }
+.hero__copy { align-self: center; }
+.hero h1 { font-size: var(--t-display); line-height: 0.95; letter-spacing: -0.03em; max-width: 9ch; }
+.hero__sub { margin-top: 32px; max-width: 36ch; font-size: clamp(19px, 1.6vw, 23px); line-height: 1.45; }
+.hero__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+.hero__aside { justify-self: end; width: min(400px, 100%); display: grid; gap: 14px; }
+.vote { color: var(--ink); padding: 22px; border-radius: var(--r); background: var(--glass-strong); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); display: grid; gap: 14px; }
+.who { display: flex; gap: 14px; align-items: center; }
+.avatar { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--ink); color: var(--paper); font-size: 15px; font-weight: 600; }
+.meter { height: 8px; border-radius: 99px; background: var(--track); overflow: hidden; }
+.meter span { display: block; height: 100%; background: var(--ink); border-radius: 99px; transition: width 500ms var(--ease); }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { min-height: 40px; padding: 0 16px; border: 0; border-radius: var(--r); background: rgba(11, 12, 12, 0.08); font: 500 15px var(--font); color: var(--ink); cursor: pointer; }
+.chip--ink { background: var(--ink); color: var(--paper); }
+.chip[disabled] { opacity: 0.5; cursor: default; }
+
+/* Rates chart */
+.rates { display: grid; gap: 64px; }
+.split { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 40px; align-items: end; }
+.compare dl { display: grid; gap: 12px; }
+.row { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 24px; align-items: center; padding: 22px 24px; border-radius: var(--r); background: var(--panel); }
+.row dd { display: flex; align-items: center; gap: 20px; min-width: 0; }
+.track { flex: 1; min-width: 0; }
+.bar { display: block; height: 56px; border-radius: 6px; background: var(--ink); }
+.row--app .bar { background: var(--rust); }
+.fig { font-size: clamp(30px, 3.6vw, 52px); font-weight: 500; letter-spacing: -0.04em; white-space: nowrap; }
+.compare figcaption { margin-top: 20px; }
+
+/* How it works */
+.how { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 40px; align-items: start; }
+.how__head { position: sticky; top: 140px; display: grid; gap: 28px; }
+.steps { list-style: none; padding: 0; display: grid; gap: 16px; }
+.step { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 24px; align-items: end; min-height: 200px; padding: 34px 30px; border-radius: var(--r); }
+.step p { font-size: 17px; }
+.step--solid { background: var(--paper); }
+
+/* Modes */
+.modes h2 { margin-bottom: 56px; }
+.modes__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.mode { display: flex; flex-direction: column; min-height: 480px; padding: 40px; border-radius: var(--r); }
+.mode__fig { margin-top: auto; padding-top: 48px; font-size: clamp(60px, 7.6vw, 120px); line-height: 0.9; font-weight: 500; letter-spacing: -0.05em; }
+.mode__label { margin: 12px 0 28px; }
+.mode p:last-child { max-width: 44ch; }
+.mode--ink { background: var(--ink); color: var(--on-dark); }
+.mode--rust { background: var(--rust); color: var(--on-dark); }
+
+/* Calculator */
+.calc-s { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 40px 64px; }
+.calc-s__head { grid-column: 1 / -1; display: grid; gap: 24px; }
+.calc { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; padding: 36px; border-radius: var(--r); background: var(--glass-strong); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
+.fields { display: grid; gap: 26px; }
+.field { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+.field label { font-size: 16px; }
+.field output { font-weight: 500; }
+.field input { grid-column: 1 / -1; }
+input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 32px; background: transparent; cursor: pointer; touch-action: pan-y; }
+input[type="range"]::-webkit-slider-runnable-track { height: 8px; border-radius: 99px; background: linear-gradient(to right, var(--ink) var(--pct, 50%), var(--track) var(--pct, 50%)); }
+input[type="range"]::-moz-range-track { height: 8px; border-radius: 99px; background: var(--track); }
+input[type="range"]::-moz-range-progress { height: 8px; border-radius: 99px; background: var(--ink); }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; margin-top: -10px; border-radius: 50%; background: var(--accent); box-shadow: inset 0 0 0 7px var(--ink); }
+input[type="range"]::-moz-range-thumb { width: 28px; height: 28px; border: 0; border-radius: 50%; background: var(--accent); box-shadow: inset 0 0 0 7px var(--ink); }
+.result { display: flex; flex-direction: column; gap: 22px; }
+.big { font-size: clamp(42px, 4.4vw, 64px); font-weight: 500; letter-spacing: -0.045em; line-height: 1; }
+.big span { font-size: 18px; letter-spacing: 0; font-weight: 400; }
+.facts { display: grid; gap: 14px; }
+.facts dt { font-size: 15px; color: var(--ink-2); }
+.facts dd { font-size: 19px; font-weight: 500; }
+.save { padding: 12px 14px; border-radius: var(--r); background: var(--accent); }
+.save dt { color: var(--ink); }
+
+/* Safety */
+.safety { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 56px 40px; }
+.safety__head { display: grid; gap: 28px; align-content: start; }
+.flows { display: grid; gap: 16px; }
+.flow { padding: 26px; border-radius: var(--r); background: var(--panel); display: grid; gap: 16px; }
+.flow figcaption { font-weight: 500; font-size: 20px; }
+.flow ol { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; }
+.flow li { padding: 14px 10px; border-radius: var(--r); background: var(--paper); text-align: center; font-size: 16px; font-weight: 500; }
+.flow li.via { background: var(--accent); border-radius: 999px; padding: 10px 16px; }
+.flow p { font-size: 16px; }
+.flow--ink { background: var(--ink); color: var(--on-dark); }
+.flow--ink li { background: #2a2c2c; }
+.flow--ink li.via { color: var(--ink); }
+.checks { grid-column: 1 / -1; list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 40px; }
+.checks li { position: relative; padding: 16px 20px 16px 54px; border-radius: var(--r); background: var(--panel); font-size: 17px; }
+.checks li::before { content: ""; position: absolute; left: 20px; top: 19px; width: 20px; height: 20px; border-radius: 50%; background: var(--ink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M6 10.2l2.6 2.6L14 7.4' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 20px no-repeat; }
+.risk { grid-column: 1 / -1; max-width: 70ch; font-size: 17px; }
+
+/* Pricing */
+.pricing h2 { margin-bottom: 48px; }
+.prices { list-style: none; padding: 0; display: grid; gap: 12px; }
+.prices li { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 3fr) minmax(0, 5fr); grid-template-areas: "what fig detail" "what per detail"; gap: 4px 32px; padding: 30px; border-radius: var(--r); background: var(--paper); }
+.prices h3 { grid-area: what; }
+.prices .pfig { grid-area: fig; font-size: clamp(34px, 3.4vw, 52px); line-height: 1; font-weight: 500; letter-spacing: -0.04em; }
+.prices .per { grid-area: per; }
+.prices .detail { grid-area: detail; font-size: 17px; }
+.pricing .small { margin-top: 20px; }
+
+/* Pilot */
+.pilot { display: grid; gap: 48px; }
+.roadmap { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.roadmap li { display: flex; flex-direction: column; justify-content: space-between; gap: 40px; min-height: 280px; padding: 30px; border-radius: var(--r); }
+.roadmap h3 { font-size: clamp(28px, 2.8vw, 42px) !important; letter-spacing: -0.035em !important; }
+.roadmap p { font-size: 17px; }
+.roadmap .now { background: var(--accent); }
+
+/* People + FAQ */
+.people { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 56px 40px; }
+.people h2 { margin-bottom: 36px; }
+.team { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.team li { display: grid; gap: 4px; padding: 18px; border-radius: var(--r); background: var(--panel); }
+.mono { display: grid; place-items: center; aspect-ratio: 1; max-width: 100%; margin-bottom: 14px; border-radius: 6px; background: var(--ink); color: var(--accent); font-size: clamp(40px, 5vw, 68px); font-weight: 500; letter-spacing: -0.05em; }
+.team strong { font-size: 20px; font-weight: 500; }
+.ask { margin-top: 22px; font-size: 17px; max-width: 44ch; }
+details { border-radius: var(--r); background: var(--panel); margin-bottom: 10px; }
+summary { display: flex; justify-content: space-between; gap: 16px; padding: 20px 24px; font-size: 19px; font-weight: 500; cursor: pointer; list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; font-weight: 400; font-size: 26px; line-height: 1; transition: transform 200ms var(--ease); }
+details[open] summary::after { transform: rotate(45deg); }
+details p { padding: 0 24px 22px; max-width: 62ch; font-size: 17px; }
+
+/* Close */
+.cta { min-height: 86vh; display: grid; align-content: center; justify-items: start; gap: 26px; }
+.cta h2 { font-size: var(--t-display) !important; line-height: 0.95 !important; letter-spacing: -0.03em !important; max-width: 7ch !important; }
+.cta .lede { max-width: 28ch; }
+footer { display: grid; gap: 36px; padding-block: 56px 40px; padding-left: max(var(--m), env(safe-area-inset-left, 0px)); padding-right: max(var(--m), env(safe-area-inset-right, 0px)); background: rgba(7, 17, 13, 0.72); color: var(--on-night); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); }
+footer .small { color: var(--on-night-2); }
+footer .wordmark { font-size: clamp(60px, 15vw, 220px); line-height: 0.9; gap: 0.12em; font-weight: 500; letter-spacing: -0.03em; }
+footer .wordmark i { background: var(--gold); box-shadow: inset 0 0 0 0.16em var(--night); }
+.footer__cols { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 3fr) minmax(0, 3fr); gap: 40px; }
+.footer__cols p { font-size: 16px; max-width: 52ch; }
+.footer__cols ul { list-style: none; padding: 0; display: grid; gap: 8px; }
+.footer__cols a { text-decoration: none; }
+.footer__cols a:hover { text-decoration: underline; }
+
+/* Opening: the page waits while the jewel unfolds, then each piece drops into place with a slight settle. */
+[data-fall] { transition: transform 1100ms cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i, 0) * 110ms), opacity 600ms ease calc(var(--i, 0) * 110ms); }
+.intro-wait [data-fall] { opacity: 0; transform: translateY(-90px); transition: none; }
+.intro-wait main > section:not(.hero), .intro-wait footer { visibility: hidden; }
+.skip { position: fixed; z-index: 20; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); min-height: 40px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--glass-dark); color: var(--on-dark); font: 500 15px var(--font); cursor: pointer; -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur)); transition: opacity 300ms ease; }
+html:not(.intro-wait) .skip { opacity: 0; pointer-events: none; }
+
+@media (max-width: 1080px) {
+  .hero, .split, .how, .calc-s, .safety, .people { grid-template-columns: minmax(0, 1fr); }
+  .hero__aside { justify-self: start; }
+  .how__head { position: static; }
+  .roadmap { grid-template-columns: minmax(0, 1fr); }
+  .roadmap li { min-height: 0; }
+  .pill a { padding: 10px 12px; }
+}
+@media (max-width: 820px) {
+  .nav { grid-template-columns: 1fr auto; }
+  .pill { display: none; }
+  .hero { padding-top: 120px; min-height: 0; gap: 48px; }
+  .hero__copy { padding-bottom: 26vh; }
+  .hero__actions .btn { flex: 1 1 auto; justify-content: center; }
+  .row { grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 18px; }
+  .bar { height: 36px; }
+  .step { grid-template-columns: minmax(0, 1fr); min-height: 0; padding: 26px 22px; gap: 10px; }
+  .modes__grid, .checks, .footer__cols, .calc { grid-template-columns: minmax(0, 1fr); }
+  .mode { min-height: 0; padding: 28px 22px; }
+  .calc { padding: 24px 20px; }
+  .prices li { grid-template-columns: minmax(0, 1fr); grid-template-areas: "what" "fig" "per" "detail"; gap: 6px; padding: 24px 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition-duration: 1ms !important; }
+}
+</style>
+
+<script>
+  // Hold the first screen back for the opening, unless motion is reduced. A timer releases it even if the 3D never loads.
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.documentElement.classList.add("intro-wait");
+    window.__releaseIntro = () => document.documentElement.classList.remove("intro-wait");
+    setTimeout(window.__releaseIntro, 9000);
+  }
+</script>
+<canvas id="jewel" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<button class="skip" type="button" id="skip-intro">Skip intro</button>
+
+<header class="nav" data-fall style="--i:0">
+  <a href="#top" class="wordmark" aria-label="Circles home"><i aria-hidden="true"></i>circles</a>
+  <nav class="pill" aria-label="Sections">
+    <a href="#how">How it works</a>
+    <a href="#rates">Rates</a>
+    <a href="#safety">Safety</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+  <a href="#calc" class="btn btn--small">Work out a loan <span class="arrow" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5 8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+</header>
+
+<main id="top">
+  <section class="s s--night hero" aria-labelledby="hero-title">
+    <div class="hero__copy">
+      <h1 id="hero-title" data-fall style="--i:1">Your friends are the <span class="gild">bank.</span></h1>
+      <p class="hero__sub" data-fall style="--i:2">Circles helps 5 to 20 people who trust each other pool ₹500 to ₹5,000 a month, vote on loans for one another and repay by UPI, at a rate the circle sets.</p>
+      <div class="hero__actions" data-fall style="--i:3">
+        <a href="#calc" class="btn btn--accent">Work out a loan <span class="arrow" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5 8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+        <a href="#how" class="btn btn--ghost">See how it works</a>
+      </div>
+    </div>
+    <div class="hero__aside" data-fall style="--i:4">
+      <div class="vote" aria-label="Example: a loan request waiting for votes">
+        <div class="who">
+          <span class="avatar" aria-hidden="true">RV</span>
+          <div>
+            <p style="font-weight:500;line-height:1.3">Rohan asks Hostel 4 for ₹3,000</p>
+            <p class="small">Train tickets home for Diwali · 3 months at 8%</p>
+          </div>
+        </div>
+        <div class="meter" role="img" id="vote-meter" aria-label="3 of 5 yes votes needed"><span id="vote-bar" style="width:60%"></span></div>
+        <p class="small" style="color:var(--ink)" id="vote-count"><span class="num">3 of 5</span> yes votes needed</p>
+        <div class="chips">
+          <button class="chip chip--ink" id="vote-yes" type="button">Vote yes</button>
+          <button class="chip" id="vote-no" type="button">Vote no</button>
+        </div>
+      </div>
+      <p class="small">Example request. Circles is a prototype: UPI, eKYC and the lending partner are simulated, and no real money moves.</p>
+    </div>
+  </section>
+
+  <section class="s s--paper rates" id="rates" aria-labelledby="rates-title">
+    <div class="split">
+      <h2 id="rates-title">One ₹10,000 loan, three prices.</h2>
+      <p class="lede">Banks want collateral. Instant-loan apps charge 24 to 36% a year. And your friends' savings earn less than inflation.</p>
+    </div>
+    <figure class="compare">
+      <dl id="compare"></dl>
+      <figcaption class="small">Interest on ₹10,000 repaid over 12 months, on a reducing balance. With a circle, that interest goes to the friends who lent it.</figcaption>
+    </figure>
+  </section>
+
+  <section class="s how" id="how" aria-labelledby="how-title">
+    <div class="how__head">
+      <h2 id="how-title">Four things your circle does.</h2>
+      <p class="lede">Everything happens between people who already know each other. Circles keeps the record.</p>
+    </div>
+    <ol class="steps">
+      <li class="step glass"><h3>Form a circle</h3><p>Invite 5 to 20 friends, classmates or teammates. Each person verifies once with Aadhaar eKYC and a PAN check.</p></li>
+      <li class="step glass"><h3>Pool every month</h3><p>Everyone commits ₹500 to ₹5,000 a month. The money stays in each member's own bank account until it's lent. Circles only keeps the shared total.</p></li>
+      <li class="step glass"><h3>Vote on loans</h3><p>A member asks for ₹1,000 to ₹15,000 and says what it's for. When 70% of the circle votes yes, it's approved. Your circle can change that bar.</p></li>
+      <li class="step step--solid"><h3>Repay by UPI</h3><p>Lenders send by UPI straight to the borrower, and repayments come back the same way, with AutoPay if you want it. Every rupee lands in the shared ledger.</p></li>
+    </ol>
+  </section>
+
+  <section class="s s--paper modes" aria-labelledby="modes-title">
+    <h2 id="modes-title">Idle money in the pool can still earn.</h2>
+    <div class="modes__grid">
+      <article class="mode mode--ink">
+        <h3>Inside the circle</h3>
+        <p class="mode__fig num">₹1k–15k</p>
+        <p class="mode__label">per loan, at 0 to 12% a year as your circle decides</p>
+        <p>Members borrow from each other for fees, laptops, rent deposits and trips home. Each repayment builds a history the whole circle can see.</p>
+      </article>
+      <article class="mode mode--rust">
+        <h3>Outside the circle</h3>
+        <p class="mode__fig num">10–14%</p>
+        <p class="mode__label">a year, target return on surplus</p>
+        <p>When the pool holds more than members need, the circle can vote to lend the surplus to vetted borrowers through a licensed NBFC-P2P partner. The money moves through a bank-appointed escrow trustee, never through Circles.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="s calc-s" id="calc" aria-labelledby="calc-title">
+    <div class="calc-s__head">
+      <h2 id="calc-title">Work out a loan with your circle.</h2>
+      <p class="lede">Move the sliders. Each stone orbiting the diamond is one person in your circle. The gold one is you.</p>
+    </div>
+    <div class="calc">
+      <div class="fields">
+        <div class="field"><label for="amt">You need</label><output for="amt" id="amt-o" class="num"></output><input id="amt" type="range" min="1000" max="15000" step="500" value="10000"></div>
+        <div class="field"><label for="mo">Paid back over</label><output for="mo" id="mo-o" class="num"></output><input id="mo" type="range" min="3" max="12" step="1" value="6"></div>
+        <div class="field"><label for="rate">Your circle's rate</label><output for="rate" id="rate-o" class="num"></output><input id="rate" type="range" min="0" max="12" step="1" value="8"></div>
+        <div class="field"><label for="mem">People in your circle</label><output for="mem" id="mem-o" class="num"></output><input id="mem" type="range" min="5" max="20" step="1" value="8"></div>
+      </div>
+      <div class="result" aria-live="polite">
+        <p class="big num"><span id="emi" style="font-size:inherit;letter-spacing:inherit;font-weight:inherit"></span><span> a month</span></p>
+        <dl class="facts">
+          <div><dt>Interest you pay</dt><dd class="num" id="int"></dd></div>
+          <div><dt>Same loan from an app at 30%</dt><dd class="num" id="app"></dd></div>
+          <div class="save"><dt>You keep</dt><dd class="num" id="keep"></dd></div>
+          <div><dt id="share-l"></dt><dd class="num" id="share"></dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="s s--paper safety" id="safety" aria-labelledby="safety-title">
+    <div class="safety__head">
+      <h2 id="safety-title">Circles never holds your money.</h2>
+      <p class="lede">Money moves bank to bank over UPI, or through a bank-held escrow account. We keep the ledger.</p>
+    </div>
+    <div class="flows">
+      <figure class="flow">
+        <figcaption>A loan inside your circle</figcaption>
+        <ol><li>Lenders' banks</li><li class="via">UPI</li><li>Borrower's bank</li></ol>
+        <p>Circles writes each transfer and its UPI reference into the ledger.</p>
+      </figure>
+      <figure class="flow flow--ink">
+        <figcaption>A loan outside your circle</figcaption>
+        <ol><li>Many circles</li><li class="via">Escrow trustee</li><li>Vetted borrower</li></ol>
+        <p>Held by a bank-appointed trustee and run with the NBFC-P2P partner, reconciled daily.</p>
+      </figure>
+    </div>
+    <ul class="checks">
+      <li>Aadhaar eKYC and a PAN check for every member before they can lend or borrow.</li>
+      <li>A digital loan agreement and a Key Fact Statement before any money moves.</li>
+      <li>First loans are capped. The cap rises after every three on-time repayments.</li>
+      <li>Outside borrowers are assessed on bank statements, enrolment, UPI history and gig income.</li>
+      <li>Repayments on outside loans are reported to credit bureaus.</li>
+      <li>Every outside loan is split across many circles, so one default never lands on one group.</li>
+      <li>The ledger is reconciled with the escrow bank every day.</li>
+      <li>Circles is a Lending Service Provider working with a licensed NBFC-P2P partner, under RBI's P2P rules.</li>
+    </ul>
+    <p class="risk">Lending carries risk. If a borrower doesn't repay, you can lose some or all of what you lent. Only lend what you can do without.</p>
+  </section>
+
+  <section class="s s--panel pricing" id="pricing" aria-labelledby="pricing-title">
+    <h2 id="pricing-title">What Circles charges.</h2>
+    <ul class="prices">
+      <li><h3>Loans inside your circle</h3><p class="pfig num">0.5–1%</p><p class="per small">per loan, optional</p><p class="detail">Your circle decides whether to switch the fee on. Loans can run with no fee at all.</p></li>
+      <li><h3>Lending your surplus outside</h3><p class="pfig num">2–4%</p><p class="per small">of the loan amount</p><p class="detail">Charged on outside loans only, and shown in the Key Fact Statement before anyone commits.</p></li>
+      <li><h3>Circle Pro</h3><p class="pfig num">₹100–2,500</p><p class="per small">a month, per circle</p><p class="detail">Liquidity and repayment analytics, plus auto-lending of idle surplus. Priced by circle size.</p></li>
+    </ul>
+    <p class="small">Indicative pricing from our pilot plan. Every loan's Key Fact Statement shows the final fees before anyone commits.</p>
+  </section>
+
+  <section class="s pilot" aria-labelledby="pilot-title">
+    <div class="split">
+      <h2 id="pilot-title">Starting at IIFT Kakinada.</h2>
+      <p class="lede">A closed pilot on one campus first, then the cities where young people move for study and first jobs.</p>
+    </div>
+    <ol class="roadmap">
+      <li class="now"><h3>Pilot</h3><p>10 to 15 circles at IIFT Kakinada. Loans inside circles only, while we set up the legal side and the escrow integration.</p></li>
+      <li class="glass"><h3>Months 6–18</h3><p>1,000 to 5,000 circles across Tier 1 and Tier 2 cities. Outside loans of up to ₹2 lakh through the NBFC-P2P partner.</p></li>
+      <li class="glass"><h3>After 18 months</h3><p>5,000+ circles, our own NBFC-P2P licence, and the same tools for India's traditional self-help groups.</p></li>
+    </ol>
+  </section>
+
+  <section class="s s--paper people" aria-labelledby="faq-title">
+    <div>
+      <h2 id="team-title">Who's building it.</h2>
+      <ul class="team">
+        <li><span class="mono" aria-hidden="true">JS</span><strong>J Sai Srikiran</strong><span class="small">Co-founder</span></li>
+        <li><span class="mono" aria-hidden="true">AP</span><strong>Anadi V Pathak</strong><span class="small">Co-founder</span></li>
+      </ul>
+      <p class="ask">We're looking for mentors in fintech, banking compliance and RBI regulation, and introductions to NBFC-P2P founders and escrow banks.</p>
+    </div>
+    <div id="faq">
+      <h2 id="faq-title">Questions people ask first.</h2>
+      <details><summary>Does Circles hold my money?</summary><p>No. There is no Circles wallet. Money moves bank to bank over UPI, and outside loans go through an escrow account held by a bank-appointed trustee. Circles keeps the record of who owes what.</p></details>
+      <details><summary>What if someone doesn't pay back?</summary><p>Inside a circle, everyone sees a missed instalment in the ledger and the circle can vote to restructure the loan. Late payers keep a low cap. On outside loans, each loan is split across many circles and repayments are reported to credit bureaus. You can still lose money, so only lend what you can do without.</p></details>
+      <details><summary>Is this legal?</summary><p>Peer-to-peer lending in India is regulated by the RBI. Circles works as a Lending Service Provider alongside a licensed NBFC-P2P partner, with escrow, eKYC, digital agreements and a Key Fact Statement for every loan.</p></details>
+      <details><summary>Who can join?</summary><p>Anyone 18 or older with an Indian bank account on UPI, an Aadhaar number and a PAN. Most circles are friends, classmates, hostel blocks, teams and clubs.</p></details>
+      <details><summary>How much can I borrow?</summary><p>Inside a circle, ₹1,000 to ₹15,000 per loan. Your first loans are capped lower, and the cap rises after every three on-time repayments.</p></details>
+    </div>
+  </section>
+
+  <section class="s s--night cta" id="close" aria-labelledby="cta-title">
+    <h2 id="cta-title">Start your circle.</h2>
+    <p class="lede">Pick a few people you'd lend to without thinking twice. That's your circle.</p>
+    <a href="#calc" class="btn btn--accent">Work out a loan <span class="arrow" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5 8 6l-3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+  </section>
+</main>
+
+<footer>
+  <a href="#top" class="wordmark"><i aria-hidden="true"></i>circles</a>
+  <div class="footer__cols">
+    <p>Circles is a prototype. UPI, eKYC and the NBFC-P2P partner are simulated and no real money moves. Lending carries risk, including the loss of what you lend.</p>
+    <ul><li><a href="#how">How it works</a></li><li><a href="#safety">Safety</a></li><li><a href="#pricing">Pricing</a></li><li><a href="#faq">FAQ</a></li></ul>
+    <p class="small">© 2026 Circles</p>
+  </div>
+</footer>
+
+<script>
+/* Calculator, comparison chart and the example vote. */
+(function () {
+  const inr = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 });
+  const rupees = (n) => "₹" + inr.format(Math.round(n));
+  const emi = (p, r, n) => (r === 0 ? p / n : (p * (r / 1200) * Math.pow(1 + r / 1200, n)) / (Math.pow(1 + r / 1200, n) - 1));
+  const interest = (p, r, n) => emi(p, r, n) * n - p;
+
+  const rows = [["An instant-loan app at 30% a year", 30], ["Your circle at 10% a year", 10], ["Your circle at 0%, if it votes that way", 0]];
+  const max = interest(10000, 30, 12);
+  document.getElementById("compare").innerHTML = rows.map(([who, r], i) => {
+    const v = interest(10000, r, 12);
+    return `<div class="row${i === 0 ? " row--app" : ""}"><dt>${who}</dt><dd><span class="track"><span class="bar" style="width:${Math.max(1.5, (v / max) * 100)}%"></span></span><span class="fig num">${rupees(v)}</span></dd></div>`;
+  }).join("");
+
+  const $ = (id) => document.getElementById(id);
+  const inputs = ["amt", "mo", "rate", "mem"].map($);
+  function update() {
+    const [a, m, r, n] = inputs.map((i) => Number(i.value));
+    inputs.forEach((i) => i.style.setProperty("--pct", ((i.value - i.min) / (i.max - i.min)) * 100 + "%"));
+    $("amt-o").textContent = rupees(a);
+    $("mo-o").textContent = m + " months";
+    $("rate-o").textContent = r + "% a year";
+    $("mem-o").textContent = n;
+    const mine = interest(a, r, m), app = interest(a, 30, m);
+    $("emi").textContent = rupees(emi(a, r, m));
+    $("int").textContent = rupees(mine);
+    $("app").textContent = rupees(app);
+    $("keep").textContent = rupees(app - mine);
+    $("share-l").textContent = `Each of the other ${n - 1} lends about`;
+    $("share").textContent = `${rupees(a / (n - 1))}, and earns ${rupees(mine / (n - 1))} back`;
+    window.dispatchEvent(new CustomEvent("circles:members", { detail: n }));
+  }
+  inputs.forEach((i) => i.addEventListener("input", update));
+  update();
+
+  let yes = 3;
+  const needed = 5;
+  function voted(v) {
+    if (v === "yes") yes = Math.min(needed, yes + 1);
+    $("vote-bar").style.width = (yes / needed) * 100 + "%";
+    $("vote-count").innerHTML = v === "yes"
+      ? `<span class="num">${yes} of ${needed}</span> yes votes. You voted yes.`
+      : `<span class="num">${yes} of ${needed}</span> yes votes. You voted no.`;
+    $("vote-yes").disabled = $("vote-no").disabled = true;
+  }
+  $("vote-yes").addEventListener("click", () => voted("yes"));
+  $("vote-no").addEventListener("click", () => voted("no"));
+})();
+</script>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+/* The jewel: a round brilliant in a gold bezel, a pavé halo, and gold bands that precess around it.
+   Built in code so the page needs no model files. */
+import * as THREE from "three";
+import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
+
+const canvas = document.getElementById("jewel");
+const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+} catch (e) {
+  canvas.remove();
+  throw e;
+}
+document.documentElement.classList.add("has-jewel");
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(getComputedStyle(document.body).backgroundColor);
+
+// A dark photo studio with bright softboxes: the contrast is what makes gold and diamond read as precious.
+const pmrem = new THREE.PMREMGenerator(renderer);
+const studio = new THREE.Scene();
+studio.background = new THREE.Color(0x2a2724);
+const softbox = (w, h, pos, power, tint = 0xffffff) => {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(tint).multiplyScalar(power), side: THREE.DoubleSide }));
+  m.position.set(...pos);
+  m.lookAt(0, 0, 0);
+  studio.add(m);
+};
+softbox(7, 4, [0, 7, 5], 7);
+softbox(3, 8, [-8, 1, 3], 5);
+softbox(3, 8, [8, 2, 1], 4, 0xfff1d6);
+softbox(10, 1.5, [0, -6, 6], 2.2);
+softbox(4, 4, [3, 4, -8], 6);
+softbox(1.2, 1.2, [-3, 5, 7], 18);
+softbox(1.2, 1.2, [4, -2, 8], 14, 0xffe3b0);
+const envMap = pmrem.fromScene(studio, 0.015).texture;
+scene.environment = envMap;
+
+const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+camera.position.set(0, 0, 13);
+const key = new THREE.DirectionalLight(0xfff4e0, 2.4);
+key.position.set(3, 5, 7);
+scene.add(key);
+
+const gold = new THREE.MeshPhysicalMaterial({ color: 0xf8cf72, metalness: 1, roughness: 0.13, clearcoat: 0.5, clearcoatRoughness: 0.06, envMapIntensity: 1.5 });
+const diamond = new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 0, roughness: 0, transmission: 1, thickness: 1.6, ior: 2.42, dispersion: 6, iridescence: 0.3, iridescenceIOR: 1.6, specularIntensity: 1, envMapIntensity: 2.4, flatShading: true });
+// The centre stone: clear green, polished smooth. Light tint on the surface, colour that builds gently with depth,
+// so you see through it to the gold behind.
+const greenDiamond = new THREE.MeshPhysicalMaterial({
+  color: 0xd2fbe9,
+  metalness: 0,
+  roughness: 0.02,
+  transmission: 1,
+  thickness: 2.2,
+  ior: 1.75,
+  dispersion: 2,
+  attenuationColor: new THREE.Color(0x0fb989),
+  attenuationDistance: 3.6,
+  clearcoat: 0.4,
+  clearcoatRoughness: 0.04,
+  iridescence: 0.12,
+  specularIntensity: 0.7,
+  specularColor: new THREE.Color(0xeafff3),
+  envMapIntensity: 1.5,
+});
+
+// A natural, freeform stone: a dense sphere pushed out and in by layered smooth waves, flattened like a
+// tumbled gem, with smooth normals so it reads as polished rather than faceted.
+function naturalStone() {
+  let geo = new THREE.IcosahedronGeometry(1, 48);
+  geo.deleteAttribute("normal");
+  geo.deleteAttribute("uv");
+  geo = mergeVertices(geo);
+  let seed = 7;
+  const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  const waves = [[1.3, 0.11], [2.2, 0.07], [3.5, 0.035], [5.5, 0.016], [9, 0.006]].map(([f, a]) => {
+    const k = new THREE.Vector3(rand() - 0.5, rand() - 0.5, rand() - 0.5).normalize().multiplyScalar(f);
+    return { k, a, ph: rand() * Math.PI * 2 };
+  });
+  const pos = geo.attributes.position, v = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    v.fromBufferAttribute(pos, i).normalize();
+    let n = 0;
+    for (const w of waves) n += w.a * Math.sin(v.dot(w.k) + w.ph);
+    v.multiplyScalar(0.94 * (1 + n));
+    v.z = v.z * 0.62 + (v.z > 0 ? 0.04 : 0);   // flatter, a little fuller on the face side
+    pos.setXYZ(i, v.x, v.y, v.z);
+  }
+  geo.computeVertexNormals();
+  return geo;
+}
+
+// Inclusions: fine flecks and a few feathery planes suspended inside, the way natural green stones carry them.
+function inclusions() {
+  const group = new THREE.Group();
+  // Opaque on purpose: the stone's refraction only shows what is drawn before it, so these must be solid to be seen through it.
+  const fleck = new THREE.MeshPhysicalMaterial({ color: 0xf2fff7, metalness: 0.6, roughness: 0.25, envMapIntensity: 2.2 });
+  const feather = new THREE.MeshPhysicalMaterial({ color: 0xe6fff0, metalness: 0.3, roughness: 0.15, side: THREE.DoubleSide, envMapIntensity: 2.5, iridescence: 1 });
+  let seed = 11;
+  const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  const flecks = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 0), fleck, 70);
+  const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), s = new THREE.Vector3(), p = new THREE.Vector3();
+  for (let i = 0; i < 70; i++) {
+    const r = 0.65 * Math.cbrt(rand()), a = rand() * Math.PI * 2, b = Math.acos(2 * rand() - 1);
+    p.set(r * Math.sin(b) * Math.cos(a), r * Math.sin(b) * Math.sin(a), r * Math.cos(b) * 0.5);
+    q.setFromEuler(e.set(rand() * 6, rand() * 6, rand() * 6));
+    const k = 0.008 + rand() * 0.02;
+    s.set(k, k * (0.3 + rand()), k * 0.4);
+    flecks.setMatrixAt(i, m.compose(p, q, s));
+  }
+  group.add(flecks);
+  for (let i = 0; i < 4; i++) {
+    const plane = new THREE.Mesh(new THREE.CircleGeometry(0.06 + rand() * 0.08, 7), feather);
+    plane.position.set((rand() - 0.5) * 0.9, (rand() - 0.5) * 0.9, (rand() - 0.5) * 0.4);
+    plane.rotation.set(rand() * 6, rand() * 6, rand() * 6);
+    plane.scale.y = 0.3 + rand() * 0.4;
+    group.add(plane);
+  }
+  return group;
+}
+
+// Round brilliant, girdle radius 1, table facing +Z: table, 8 stars, 8 bezels, 32 upper girdles, 8 pavilion mains, 32 lower girdles.
+function brilliant() {
+  const N = 32, g = 0.02, tr = 0.56, tz = 0.32, sr = 0.78, cz = -0.86, mr = 0.42, mz = -0.49;
+  const sz = tz - ((sr - tr) / (1 - tr)) * (tz - g);
+  const P = (r, a, z) => new THREE.Vector3(r * Math.cos(a), r * Math.sin(a), z);
+  const G = [], B = [], T = [], S = [], M = [];
+  for (let k = 0; k < N; k++) { G.push(P(1, (2 * Math.PI * k) / N, g)); B.push(P(1, (2 * Math.PI * k) / N, -g)); }
+  for (let j = 0; j < 8; j++) {
+    T.push(P(tr, (Math.PI / 4) * j, tz));
+    S.push(P(sr, (Math.PI / 4) * j + Math.PI / 8, sz));
+    M.push(P(mr, (Math.PI / 4) * j + Math.PI / 8, mz));
+  }
+  const C = new THREE.Vector3(0, 0, cz), TC = new THREE.Vector3(0, 0, tz), O = new THREE.Vector3(0, 0, -0.15);
+  const pos = [];
+  const tri = (a, b, c) => {
+    const n = new THREE.Vector3().subVectors(b, a).cross(new THREE.Vector3().subVectors(c, a));
+    const mid = new THREE.Vector3().add(a).add(b).add(c).multiplyScalar(1 / 3).sub(O);
+    if (n.dot(mid) < 0) [b, c] = [c, b];
+    pos.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
+  };
+  for (let j = 0; j < 8; j++) {
+    const jn = (j + 1) % 8, jp = (j + 7) % 8;
+    tri(TC, T[j], T[jn]);
+    tri(T[j], T[jn], S[j]);
+    tri(T[j], S[jp], G[4 * j]); tri(T[j], G[4 * j], S[j]);
+    for (let k = 0; k < 4; k++) tri(S[j], G[(4 * j + k) % N], G[(4 * j + k + 1) % N]);
+    tri(B[4 * j], M[jp], C); tri(B[4 * j], C, M[j]);
+    for (let k = 0; k < 4; k++) tri(M[j], B[(4 * j + k + 1) % N], B[(4 * j + k) % N]);
+  }
+  for (let k = 0; k < N; k++) { const kn = (k + 1) % N; tri(G[k], B[k], B[kn]); tri(G[k], B[kn], G[kn]); }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+  geo.computeVertexNormals();
+  return geo;
+}
+
+function lathe(profile, segs = 180) {
+  const pts = profile.concat([profile[0]]).map(([r, z]) => new THREE.Vector2(r, z));
+  const geo = new THREE.LatheGeometry(pts, segs);
+  geo.rotateX(Math.PI / 2); // lathe revolves around Y; the jewel faces +Z
+  return geo;
+}
+
+function ringOf(geo, mat, count, radius, z, scale, phase = 0) {
+  const mesh = new THREE.InstancedMesh(geo, mat, count);
+  const m = new THREE.Matrix4(), q = new THREE.Quaternion(), s = new THREE.Vector3(scale, scale, scale), p = new THREE.Vector3();
+  for (let i = 0; i < count; i++) {
+    const a = (2 * Math.PI * i) / count + phase;
+    p.set(radius * Math.cos(a), radius * Math.sin(a), z);
+    q.setFromAxisAngle(new THREE.Vector3(0, 0, 1), a);
+    mesh.setMatrixAt(i, m.compose(p, q, s));
+  }
+  return mesh;
+}
+
+const stoneGeo = brilliant();
+const beadGeo = new THREE.SphereGeometry(1, 12, 8);
+
+const jewel = new THREE.Group();
+const centre = new THREE.Mesh(naturalStone(), greenDiamond);
+centre.add(inclusions());
+jewel.add(centre);
+
+// Guilloché dial under the stone: a sunburst of fine engraved rays, seen through the green glass.
+function sunburst() {
+  const geo = new THREE.RingGeometry(0.02, 1.0, 360, 24);
+  const pos = geo.attributes.position, v = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    v.fromBufferAttribute(pos, i);
+    const r = Math.hypot(v.x, v.y), a = Math.atan2(v.y, v.x);
+    v.z = 0.012 * Math.sin(a * 60) * Math.min(1, r * 3) + 0.004 * Math.sin(r * 70) - r * r * 0.08;
+    pos.setXYZ(i, v.x, v.y, v.z);
+  }
+  geo.computeVertexNormals();
+  const dial = new THREE.Mesh(geo, new THREE.MeshPhysicalMaterial({ color: 0xf6d27e, metalness: 1, roughness: 0.22, envMapIntensity: 1.6 }));
+  dial.position.z = -0.46;
+  return dial;
+}
+jewel.add(sunburst());
+jewel.add(new THREE.Mesh(lathe([[0.985, 0.1], [1.0, 0.17], [1.035, 0.205], [1.09, 0.215], [1.13, 0.19], [1.15, 0.12], [1.15, 0.02], [1.12, -0.14], [1.02, -0.3], [0.86, -0.42], [0.8, -0.4], [0.93, -0.27], [1.01, -0.1], [0.99, 0.02]]), gold));
+jewel.add(ringOf(beadGeo, gold, 110, 1.085, 0.222, 0.019));                     // milgrain on the bezel lip
+jewel.add(new THREE.Mesh(lathe([[1.205, 0.02], [1.22, 0.085], [1.245, 0.095], [1.255, 0.05], [1.385, 0.05], [1.395, 0.095], [1.42, 0.085], [1.435, 0.02], [1.42, -0.09], [1.32, -0.13], [1.22, -0.09]]), gold));
+jewel.add(ringOf(stoneGeo, diamond, 44, 1.32, 0.11, 0.082));                    // pavé halo
+jewel.add(ringOf(beadGeo, gold, 44, 1.25, 0.115, 0.024, Math.PI / 44));         // inner prongs
+jewel.add(ringOf(beadGeo, gold, 44, 1.39, 0.115, 0.024, Math.PI / 44));         // outer prongs
+
+// Woven bands: radius, wire thickness, tilt (deg), centre offset. Each turns slowly on its own axis.
+const deg = THREE.MathUtils.degToRad;
+const bands = [];
+[
+  [1.66, 0.105, [9, -6, 0], [0.05, -0.04, 0.02]],
+  [1.86, 0.075, [-12, 10, 40], [-0.08, 0.06, 0]],
+  [2.06, 0.12, [14, 12, 95], [0.1, 0.08, -0.03]],
+  [2.26, 0.08, [-8, -15, 150], [-0.06, -0.1, 0.02]],
+  [2.44, 0.11, [16, -9, 205], [0.12, -0.02, -0.04]],
+  [1.96, 0.085, [-6, 18, 300], [0, 0, 0.03], true],
+].forEach(([R, r, rot, off, pave], i) => {
+  const pivot = new THREE.Object3D();
+  const band = new THREE.Mesh(new THREE.TorusGeometry(R, r, 32, 260), gold);
+  band.rotation.set(deg(rot[0]), deg(rot[1]), deg(rot[2]));
+  band.position.set(...off);
+  if (pave) band.add(ringOf(stoneGeo, diamond, 72, R, r * 0.95, 0.056));
+  pivot.add(band);
+  jewel.add(pivot);
+  const axis = new THREE.Vector3(Math.sin(i * 1.7), Math.cos(i * 1.3), 0.5 + 0.3 * Math.sin(i)).normalize();
+  bands.push({ pivot, band, rot: band.rotation.clone(), off: band.position.clone(), axis, speed: (i % 2 ? -1 : 1) * (0.045 + 0.02 * i), delay: i * 0.06 });
+});
+
+const rig = new THREE.Group();
+rig.add(jewel);
+scene.add(rig);
+
+// Circle members: small stones orbiting the jewel; the first one, in gold, is you.
+const orbit = new THREE.Group();
+orbit.rotation.set(1.15, 0, -0.2);
+rig.add(orbit);
+const youMat = new THREE.MeshPhysicalMaterial({ color: 0xffb000, metalness: 1, roughness: 0.16, clearcoat: 0.6, envMapIntensity: 1.5 });
+const ORBIT = 2.95, DIP = 1.55;
+const tokens = [];
+function setMembers(n) {
+  n = Math.max(3, Math.min(24, Math.round(n)));
+  while (tokens.length < n) {
+    const first = tokens.length === 0;
+    const mesh = new THREE.Mesh(first ? beadGeo : stoneGeo, first ? youMat : diamond);
+    mesh.scale.setScalar(0.001);
+    orbit.add(mesh);
+    const last = tokens[tokens.length - 1];
+    tokens.push({ mesh, angle: last ? last.angle : 0, target: 0, scale: 1 });
+  }
+  tokens.forEach((t, i) => { t.scale = i < n ? (i === 0 ? 0.11 : 0.15) : 0; t.target = (i / n) * Math.PI * 2; });
+  if (still) frame(0);
+}
+addEventListener("circles:members", (e) => setMembers(e.detail));
+
+let w = 0, h = 0;
+const home = { x: 0, y: 0, s: 1 };   // where the jewel rests once the opening is over
+function resize() {
+  w = innerWidth; h = innerHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  const wide = w / h > 1.1;
+  home.x = wide ? 1.75 : 0;
+  home.y = wide ? 0 : -2.0;   // on a phone the jewel sits below the intro text, not behind it
+  home.s = wide ? 0.95 : 0.6;
+  if (still) frame(0);
+}
+
+// Opening: everything lies flat and level at the centre of the screen, then the bands lift into their
+// woven angles one after another, the jewel turns to face the viewer and glides to its resting place,
+// and the first screen drops in around it.
+const INTRO_HOLD = 1.4, INTRO_MOVE = 2.6;
+let introStart = null, released = false, warmed = false;
+const ease = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const FLAT_TILT = 0;   // lying flat, parallel to the screen, facing the viewer
+
+// Opening glow: the jewel lights up from within against a dark backdrop, a ring of light pulses out as the
+// bands lift, and the backdrop brightens to the page's ground as the first screen arrives.
+const groundColor = new THREE.Color(0xe2e8e4);
+const darkColor = new THREE.Color(0x07110d);
+// How much of the night world is on screen: the hero at the top, the closing section at the end.
+const heroEl = document.querySelector(".hero"), closeEl = document.getElementById("close");
+const clamp01 = (x) => Math.min(1, Math.max(0, x));
+function nightAmount() {
+  const hb = heroEl.getBoundingClientRect().bottom, ct = closeEl.getBoundingClientRect().top;
+  return Math.max(clamp01((hb - 0.3 * h) / (0.45 * h)), clamp01((0.8 * h - ct) / (0.5 * h)));
+}
+function glowTexture(ring, wide = false) {
+  const c = document.createElement("canvas");
+  c.width = c.height = 256;
+  const g = c.getContext("2d");
+  const grad = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+  if (wide) {
+    grad.addColorStop(0, "rgba(255,255,255,1)");
+    grad.addColorStop(0.35, "rgba(255,255,255,0.7)");
+    grad.addColorStop(0.62, "rgba(255,255,255,0.25)");
+    grad.addColorStop(1, "rgba(255,255,255,0)");
+  } else if (ring) {
+    grad.addColorStop(0, "rgba(255,255,255,0)");
+    grad.addColorStop(0.72, "rgba(255,255,255,0)");
+    grad.addColorStop(0.84, "rgba(255,255,255,1)");
+    grad.addColorStop(1, "rgba(255,255,255,0)");
+  } else {
+    grad.addColorStop(0, "rgba(255,255,255,1)");
+    grad.addColorStop(0.22, "rgba(255,255,255,0.55)");
+    grad.addColorStop(0.55, "rgba(255,255,255,0.12)");
+    grad.addColorStop(1, "rgba(255,255,255,0)");
+  }
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 256, 256);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+const glowMat = (map, color) => new THREE.SpriteMaterial({ map, color, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+const glowTex = glowTexture(false);
+const halo = new THREE.Sprite(glowMat(glowTexture(false, true), 0x2bd994));
+halo.scale.setScalar(14);
+halo.position.z = -0.6;
+halo.renderOrder = -1;
+rig.add(halo);
+// A bloom over the stone itself, drawn on top, so the light seems to spill out of it.
+const bloom = new THREE.Sprite(glowMat(glowTex, 0x7dffc8));
+bloom.material.depthTest = false;
+bloom.renderOrder = 10;
+bloom.position.z = 0.8;
+rig.add(bloom);
+const flare = new THREE.Sprite(glowMat(glowTexture(true), 0xffd27a));
+flare.position.z = 0.4;
+rig.add(flare);
+const innerLight = new THREE.PointLight(0x7dffc0, 0, 7, 1.6);
+innerLight.position.z = 0.6;
+rig.add(innerLight);
+greenDiamond.emissive = new THREE.Color(0x14d99a);
+function release() {
+  if (released) return;
+  released = true;
+  window.__releaseIntro?.();
+}
+document.getElementById("skip-intro").addEventListener("click", () => { introStart = -1e9; release(); });
+if (still) { introStart = -1e9; release(); }
+let scrollT = 0;
+function onScroll() {
+  const max = document.documentElement.scrollHeight - innerHeight;
+  scrollT = max > 0 ? scrollY / max : 0;
+  if (still) frame(0);
+}
+let px = 0, py = 0;
+addEventListener("pointermove", (e) => { px = e.clientX / w - 0.5; py = e.clientY / h - 0.5; }, { passive: true });
+
+const clock = new THREE.Clock();
+const q = new THREE.Quaternion();
+let spin = 0, dipIndex = -1, dipStart = -10;
+function frame(dt) {
+  const t = clock.elapsedTime;
+  // The clock starts once the jewel is really on screen: the first frame can take seconds to prepare.
+  if (introStart === null && warmed) introStart = t;
+  const t0 = introStart ?? t;
+  const p = (t - t0 - INTRO_HOLD) / INTRO_MOVE;   // < 0 while holding flat, 1 when settled
+  const e = ease(p);
+  if (p > 0.45) release();
+
+  if (!still) {
+    spin += dt * 0.16 * (0.4 + 0.6 * e);
+    for (const b of bands) {
+      // Each band rises from flat in turn; it starts its slow precession once it has arrived.
+      const be = ease((p - b.delay) / (1 - b.delay * 2));
+      b.band.rotation.set(b.rot.x * be, b.rot.y * be, b.rot.z);
+      b.band.position.copy(b.off).multiplyScalar(be);
+      if (be >= 1) b.pivot.quaternion.multiply(q.setFromAxisAngle(b.axis, b.speed * dt));
+    }
+    if (e >= 1 && t - dipStart > 5.5 && tokens.length) {
+      const live = tokens.filter((x) => x.scale > 0);
+      dipIndex = tokens.indexOf(live[Math.floor(Math.random() * live.length)]);
+      dipStart = t;
+    }
+  }
+  // Glow: builds and breathes while the jewel holds flat, then fades as it moves into place.
+  const holdP = Math.min(1, Math.max(0, (t - t0) / INTRO_HOLD));
+  const glow = p < 0 ? ease(holdP) * (0.86 + 0.14 * Math.sin(t * 5.5)) : 1 - ease(p / 0.6);
+  const night = nightAmount();
+  document.documentElement.dataset.tone = night > 0.5 ? "night" : "light";
+  // In the night sections the stone keeps a quiet glow after the opening.
+  halo.material.opacity = Math.max(glow * 0.85, night * 0.32 * e);
+  halo.scale.setScalar(12 + glow * 4);
+  bloom.material.opacity = glow * 0.45;
+  bloom.scale.setScalar(2.6 + glow * 0.8);
+  greenDiamond.emissiveIntensity = glow * 0.9;
+  innerLight.intensity = glow * 26;
+  const fp = p / 0.55;   // the pulse of light that rides out as the bands lift
+  flare.material.opacity = fp > 0 && fp < 1 ? (1 - fp) * 0.85 : 0;
+  flare.scale.setScalar(2.4 + Math.max(0, fp) * 7);
+  scene.background.lerpColors(darkColor, groundColor, ease(p / 0.55) * (1 - night));
+
+  const lerp = THREE.MathUtils.lerp;
+  rig.position.set(lerp(0, home.x, e), lerp(0, home.y, e), 0);
+  rig.scale.setScalar(lerp(home.s * 1.25, home.s, e));
+  jewel.rotation.set(
+    lerp(FLAT_TILT, -0.28 + py * 0.25, e),
+    (0.18 + px * 0.4) * e,
+    0.1 + spin * 0.25 + scrollT * Math.PI * 0.8,
+  );
+  orbit.rotation.z = spin + scrollT * Math.PI * 1.2;
+  tokens.forEach((tk, i) => {
+    const k = still ? 1 : Math.min(1, dt * 4);
+    tk.angle += (tk.target - tk.angle) * k;
+    const goal = Math.max(tk.scale * ease((p - 0.75) / 0.25 - i * 0.04), 0.001);   // members arrive last
+    tk.mesh.scale.setScalar(tk.mesh.scale.x + (goal - tk.mesh.scale.x) * k);
+    let r = ORBIT;
+    if (i === dipIndex) { const p = (t - dipStart) / 2.6; if (p < 1) r = ORBIT - (ORBIT - DIP) * Math.sin(p * Math.PI); }
+    tk.mesh.position.set(Math.cos(tk.angle) * r, Math.sin(tk.angle) * r, Math.sin(tk.angle * 2) * 0.12);
+    tk.mesh.lookAt(0, 0, 0);
+  });
+  renderer.render(scene, camera);
+  warmed = true;
+}
+
+let raf = 0;
+function loop() { raf = requestAnimationFrame(loop); frame(Math.min(clock.getDelta(), 0.05)); }
+document.addEventListener("visibilitychange", () => {
+  cancelAnimationFrame(raf);
+  if (!document.hidden && !still) { clock.getDelta(); loop(); }
+});
+addEventListener("resize", resize);
+addEventListener("scroll", onScroll, { passive: true });
+resize();
+onScroll();
+setMembers(Number(document.getElementById("mem").value));
+if (still) frame(0); else loop();
+</script>

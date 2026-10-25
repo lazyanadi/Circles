@@ -1,0 +1,14 @@
+# dependencies and build output
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+
+# local-only
+.env*
+.mcp.json
+.taste-skill/
+circles-static/local/
+*.blend1
+.DS_Store
+Thumbs.db
