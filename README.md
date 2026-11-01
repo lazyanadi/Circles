@@ -1,4 +1,6 @@
-# Circles
+# Circles: Peer-Lending Circles for India
+
+**Live demo:** https://circles-anadi5.vercel.app
 
 Peer-lending circles for students and young adults in India: 5 to 20 people who trust each other pool ₹500–₹5,000 a month, vote on loans for one another and repay by UPI, at a rate the circle sets.
 
